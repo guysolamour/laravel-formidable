@@ -2,11 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -17,7 +18,16 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/home';
+    const HOME = '/dashboard';
+
+    /**
+     * This namespace is applied to your controller routes.
+     *
+     * In addition, it is set as the URL generator's root namespace.
+     *
+     * @var string
+     */
+     // protected $namespace = 'App\Http\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -31,12 +41,25 @@ class RouteServiceProvider extends ServiceProvider
         $this->routes(function () {
             Route::prefix('api')
                 ->middleware('api')
+                ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+                ->namespace($this->namespace)
+                ->group(function () {
+                  $this->getRoutesFor(base_path('routes/web/' . strtolower(config('administrable.front_namespace'))));
+                });
+
+            Route::prefix(config('administrable.auth_prefix_path'))
+                ->middleware('web')
+                ->namespace($this->namespace)
+                ->group(function(){
+                  $this->getRoutesFor(base_path('routes/web/' . strtolower(config('administrable.back_namespace'))));
+                });
         });
     }
+
+
 
     /**
      * Configure the rate limiters for the application.
@@ -46,7 +69,19 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
         });
+    }
+
+
+
+    protected function getRoutesFor(string $path)
+    {
+        $files = Finder::create()
+            ->in($path)
+            ->name('*.php');
+
+        foreach ($files as $file)
+            require $file->getRealPath();
     }
 }
