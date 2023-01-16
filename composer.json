@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "guysolamour/laravel-administrable": "^6.0",
+        "guysolamour/laravel-administrable-crudgenerator": "^1.0",
         "guysolamour/laravel-commands": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.2",

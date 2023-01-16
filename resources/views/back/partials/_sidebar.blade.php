@@ -23,6 +23,17 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
            {{-- insert sidebar links here --}}
+                     <!-- note link -->
+                     <li class="nav-item">
+                        <a href="{{ route('back.formidable.index') }}" class="nav-link {{ set_active_link('back.formidable.index') }}">
+                          <i class="nav-icon fa fa-folder icon"></i>
+                          <p>
+                            Formidable
+                          </p>
+                        </a>
+                    </li>
+                    <!-- endnote link -->
+
             @php
             $countCommentNotifications = get_guard()->unreadNotifications->filter(fn($item) => $item->type ===
             config('administrable.modules.comment.back.notification'))->count();
