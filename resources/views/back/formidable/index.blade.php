@@ -76,7 +76,7 @@
 
                                                             <th>Titre</th>
                                                             <th>Url</th>
-                                                            <th>Champs</th>
+                                                            <th>Entries</th>
                                                             <th>En ligne</th>
 
                                                             <th>Date création</th>
@@ -102,11 +102,9 @@
 
                                                             <td>{{ $loop->iteration }}</td>
                                                             <td>{{ $form->title }}</td>
-                                                            <td>{{ $form->url }}</td>
+                                                            <td>{{ $form->full_url }}</td>
                                                             <td>
-                                                                @foreach ($form->fields as $field)
-                                                                <span class="badge badge-success p-2">{{ $field->label }}</span>
-                                                                @endforeach
+                                                               {{ $form->entries?->count() ?? 0 }}
                                                             </td>
                                                             <td>
                                                                 @if($form->active)

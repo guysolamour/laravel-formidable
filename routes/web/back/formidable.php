@@ -13,5 +13,7 @@ Route::middleware(['admin.auth'])->group(function () {
         'update'     => 'back.formidable.update',
         'destroy'    => 'back.formidable.delete',
     ]);
+
+    Route::delete('formidable/{form}/entries/{id}', [FormidableController::class, 'removeEntry'])->name('back.formidable.entries.delete');
 });
 

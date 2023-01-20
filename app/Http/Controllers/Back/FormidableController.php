@@ -20,11 +20,6 @@ class FormidableController extends Controller
     {
         $forms = DynamicForm::latest()->get();
 
-        // $form = $forms->first();
-
-        // dd($form->fields);
-
-
         return view('back.formidable.index', compact('forms'));
     }
 
@@ -37,8 +32,6 @@ class FormidableController extends Controller
     {
         return view('back.formidable.create');
     }
-
-
 
     /**
      * Store a newly created resource in storage.
@@ -65,33 +58,30 @@ class FormidableController extends Controller
         return redirect()->route('back.formidable.index');
     }
 
-
-
-
-
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Note  $note
+     * @param  string  $url
      * @return \Illuminate\Http\Response
      */
-    public function show(Note $note)
+    public function show(string $url)
     {
-       return view('back.notes.show', compact('note'));
-    }
+        $form = DynamicForm::findByUrl($url)->first();
 
+       return view('back.formidable.show', compact('form'));
+    }
 
 
       /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Note  $note
+     * @param  string  $url
      * @return \Illuminate\Http\Response
      */
     public function edit(string $url)
     {
         $form = DynamicForm::findByUrl($url)->first();
-        // dd($form->full_url);
+
         return view('back.formidable.edit', compact('form'));
     }
 
@@ -99,43 +89,58 @@ class FormidableController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Note  $note
+     * @param  string  $url
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Note $note)
+    public function update(Request $request, string $url)
     {
-        $form = $this->getForm($note, NoteForm::class);
-        $form->redirectIfNotValid();
-        $note->update($request->all());
+        $data = $request->validate([
+            'title'  => 'required|string',
+            'fields' => 'required',
+            'active' => 'required|in:0,1',
+        ]);
 
-        flashy('L\' élément a bien été modifié');
+        /**  @var DynamicForm */
+        $form = DynamicForm::findByUrl($url)->first();
 
-        return redirect()->route('back.note.index');
+        $form->update([
+            'title'  => $data['title'],
+            'fields' => $data['fields'],
+            'active' => $data['active'],
+        ]);
+
+        flashy('Le formulaire a bien été modifié');
+
+        return back();
     }
-
-
-
 
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Note  $note
+     * @param  string  $url
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Note $note)
+    public function destroy(string $url)
     {
-        $note->delete();
+        /**  @var DynamicForm */
+        $form = DynamicForm::findByUrl($url)->first();
+        $form->delete();
 
-        flashy('L\' élément a bien été supprimé');
+        flashy('Le formulaire a bien été supprimé');
 
-        return redirect()->route('back.note.index');
+        return redirect()->route('back.formidable.index');
     }
 
+    public function removeEntry(string $url, int $id)
+    {
+       /**  @var DynamicForm */
+       $form = DynamicForm::findByUrl($url)->first();
+       $form->removeEntry($id);
 
+       flashy('L\' élement a bien été supprimé');
 
-
-    
-
+        return back();
+    }
 
 }

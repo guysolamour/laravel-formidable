@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Back\FormidableController;
+use App\Http\Controllers\Front\FormidableController;
 
-Route::get('formidable', [FormidableController::class, 'urlLink'])->name('formidable.url');
+Route::get('formidable', [FormidableController::class, 'show'])->name('formidable.show');
+Route::post('formidable/{url}', [FormidableController::class, 'store'])->name('formidable.store');
