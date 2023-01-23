@@ -114,7 +114,7 @@ class DynamicForm extends Model
         $data = $this->sanitizeData($data);
 
         /** @var \Illuminate\Support\Collection */
-        $entries = $this->entries;
+        $entries = $this->entries ?? collect();
 
         $entries->push([
             'id' => $entries->count() + 1,
